@@ -676,8 +676,26 @@ function renderResults(){
   /* ---- Combined synthesis ---- */
   body.insertAdjacentHTML("beforeend", synthesis(a,q,c,partAFlag));
 
+  /* ---- Top-of-page summary + Neurospicy score (prepended so it shows first) ---- */
+  body.insertAdjacentHTML("afterbegin", summaryCard(a,q,c,partAFlag));
+  const copyBtn = $("copySumBtn");
+  if(copyBtn) copyBtn.addEventListener("click", ()=>{
+    const done = ()=>{ $("copySumNote").textContent = "Copied to clipboard ✓"; };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(LAST_SUMMARY_TEXT).then(done).catch(()=>fallbackCopy(LAST_SUMMARY_TEXT,done));
+    } else fallbackCopy(LAST_SUMMARY_TEXT, done);
+  });
+
   window.scrollTo({top:0,behavior:"smooth"});
   save();
+}
+
+function fallbackCopy(text, done){
+  const ta=document.createElement("textarea");
+  ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){ $("copySumNote").textContent="Select the text above to copy."; }
+  document.body.removeChild(ta);
 }
 
 /* ---- narrative generators ---- */
@@ -718,6 +736,100 @@ function catNarrative(c){
   else if(c.total>=70) s += "You're putting moderate, deliberate effort into social situations — more than someone who finds them effortless, less than the heavy-masking range.";
   else s += "Overall camouflaging is on the lower side, suggesting you don't rely heavily on hiding or scripting to get through social situations.";
   return s;
+}
+
+/* ---- Neurospicy composite score ---- */
+function neurospice(a,q,c){
+  // component norms 0..1
+  const adhdNorm = 0.5*(a.total/72) + 0.5*(a.partAPos/6);
+  const aqNorm   = q.total/50;
+  const maskNorm = (c.total-25)/150;
+  const raw = 0.38*adhdNorm + 0.38*aqNorm + 0.24*maskNorm;
+  const score = Math.round(raw*100);
+  let label, emoji, cls;
+  if(score<20){ emoji="🫑"; label="Bell pepper — mostly neurotypical patterns"; cls="low"; }
+  else if(score<40){ emoji="🌶️"; label="Mild — a few spicy traits in the mix"; cls="low"; }
+  else if(score<60){ emoji="🌶️🌶️"; label="Medium-hot — clear neurodivergent-leaning traits"; cls="mod"; }
+  else if(score<80){ emoji="🌶️🌶️🌶️"; label="Hot — strong traits across more than one area"; cls="high"; }
+  else { emoji="🔥"; label="Ghost pepper — very strong traits across the board"; cls="high"; }
+  return {score, label, emoji, cls, adhdNorm, aqNorm, maskNorm};
+}
+
+/* ---- Plain-text version of the summary, for copy/share ---- */
+let LAST_SUMMARY_TEXT = "";
+
+/* ---- Generated narrative summary (built from your answers, on-device) ---- */
+function aiSummary(a,q,c,partAFlag,sp){
+  const aut = q.total>=32, autMaybe = q.total>=26, highMask = c.total>=100;
+  const parts = [];
+
+  // opener
+  let open = `Overall, your answers put you at a "neurospicy" score of ${sp.score} out of 100 — ${sp.label.toLowerCase()}. `;
+  const flagged = [];
+  if(partAFlag) flagged.push("ADHD");
+  if(aut) flagged.push("autistic traits");
+  if(flagged.length===2) open += "Both the ADHD and the autism screens came back elevated, which points toward a combined profile (often called AuDHD).";
+  else if(flagged.length===1) open += `The ${flagged[0]} screen is the one that stands out here.`;
+  else if(autMaybe || a.partAPos===3) open += "Nothing crossed a hard clinical line, but you're sitting in a borderline zone that's worth paying attention to rather than dismissing.";
+  else open += "Neither screen crossed its main threshold, though that never fully rules things out.";
+  parts.push(open);
+
+  // ADHD
+  parts.push("On attention and activity: " + adhdNarrative(a, a.IN/36, a.HI/36));
+
+  // Autism
+  parts.push("On autistic traits: " + aqNarrative(q));
+
+  // Masking
+  let mask = "On social effort: " + catNarrative(c);
+  if(highMask && autMaybe && !aut) mask += " This pairing — heavy masking with an AQ just under the line — is a classic way autism gets missed, because the effort hides the traits the screen looks for.";
+  parts.push(mask);
+
+  // interplay / next step
+  let close = "";
+  if(partAFlag && aut) close = "Because more than one area is elevated, the most useful next step is an assessment that can look at ADHD and autism together rather than forcing a single label.";
+  else if(sp.score>=40) close = "Taken together, there's enough here to be worth a conversation with a GP, psychologist, or psychiatrist — bring concrete, lifelong examples, not just these numbers.";
+  else close = "If day-to-day life feels harder than it looks from the outside, these scores being modest doesn't invalidate that — trust your lived experience and raise it with a professional if it's affecting you.";
+  parts.push(close);
+
+  // demographic nudge
+  if(demo.sex==="f" && (autMaybe||highMask||a.partAPos>=3))
+    parts.push("One more thing: you noted female sex assigned at birth, and both conditions are heavily under-recognised in women and girls — more inattentive ADHD, more masking, more years of being missed. Borderline results in this group deserve to be taken seriously.");
+
+  LAST_SUMMARY_TEXT =
+    `NEUROSPICY SCORE: ${sp.score}/100 — ${sp.label}\n\n` +
+    parts.join("\n\n") +
+    `\n\nScreening scores — ADHD (ASRS Part A): ${a.partAPos}/6 boxes; Autism (AQ-50): ${q.total}/50; Masking (CAT-Q): ${c.total}/175.\n` +
+    `Reminder: this is a screener, not a diagnosis.`;
+
+  return parts.map(p=>`<p>${p}</p>`).join("");
+}
+
+function summaryCard(a,q,c,partAFlag){
+  const sp = neurospice(a,q,c);
+  const grad = "linear-gradient(90deg,var(--good),var(--warn),var(--bad))";
+  const summaryHTML = aiSummary(a,q,c,partAFlag,sp);
+  return `
+    <div class="card" style="border:2px solid var(--accent)">
+      <div class="row"><h2>Your summary</h2><div class="spacer"></div>${pill(sp.cls,"Overview")}</div>
+
+      <div style="text-align:center;margin:10px 0 4px">
+        <div style="font-size:2.6rem;line-height:1">${sp.emoji}</div>
+        <div class="big" style="font-size:3rem;background:${grad};-webkit-background-clip:text;background-clip:text;color:transparent">${sp.score}<span style="font-size:1.1rem;color:var(--muted);-webkit-text-fill-color:var(--muted)"> / 100</span></div>
+        <div style="font-weight:700;margin-top:2px">Neurospicy Score</div>
+        <div class="sub">${sp.label}</div>
+      </div>
+      <div class="scorebar" style="height:16px"><i style="width:${sp.score}%;background:${grad}"></i></div>
+      <p class="sub" style="text-align:center">A single playful composite of all three screens (ADHD ${Math.round(sp.adhdNorm*100)}%, autism ${Math.round(sp.aqNorm*100)}%, masking ${Math.round(sp.maskNorm*100)}%). It's a conversation-starter, <b>not a clinical measure</b> — the individual scores below are what actually matter.</p>
+
+      <h3>What the test found</h3>
+      <div style="font-size:.98rem">${summaryHTML}</div>
+      <div class="row" style="margin-top:12px">
+        <button class="ghost" id="copySumBtn">📋 Copy summary</button>
+        <span class="sub" id="copySumNote"></span>
+      </div>
+      <div class="note danger" style="margin-top:12px">This summary is generated from your own answers on your device — nothing is sent anywhere. It's a plain-language read-back of your responses, not a diagnosis or a substitute for a clinician.</div>
+    </div>`;
 }
 
 function synthesis(a,q,c,partAFlag){
