@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neurodivergence Screener — ADHD &amp; Autism Traits</title>
+<style>
+  :root{
+    --bg:#0f1220; --panel:#181c2e; --panel2:#1f2440; --ink:#eef1fb; --muted:#a6adcb;
+    --line:#2c3352; --accent:#7c9cff; --accent2:#66e0c8; --warn:#ffb454; --bad:#ff6b81;
+    --good:#5fd68a; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#eef1f8; --panel:#ffffff; --panel2:#f3f5fc; --ink:#151a2e; --muted:#5a6280;
+      --line:#dde2f0; --accent:#3c5bd6; --accent2:#12a37f; --shadow:0 10px 30px rgba(30,40,80,.12);}
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:24px 18px 80px}
+  header.app{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  header.app .logo{font-size:30px}
+  h1{font-size:1.5rem;margin:0}
+  h2{font-size:1.25rem;margin:0 0 4px}
+  h3{font-size:1.05rem;margin:18px 0 6px}
+  .sub{color:var(--muted);font-size:.95rem;margin:2px 0 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:22px;margin:18px 0;box-shadow:var(--shadow)}
+  .note{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;
+    padding:12px 14px;font-size:.92rem;color:var(--muted)}
+  .warn{border-left-color:var(--warn)}
+  .danger{border-left-color:var(--bad)}
+  button{font:inherit;cursor:pointer;border:none;border-radius:12px;padding:12px 20px;
+    background:var(--accent);color:#fff;font-weight:600;transition:transform .06s ease,opacity .2s}
+  button:hover{opacity:.92} button:active{transform:translateY(1px)}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .spacer{flex:1}
+  .progress{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:14px 0}
+  .progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .3s}
+  .qwrap{margin:0}
+  .q{padding:16px 0;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:none}
+  .q .qtext{font-weight:600;margin-bottom:10px;display:flex;gap:10px}
+  .q .qnum{color:var(--muted);font-weight:700;flex:none}
+  .opts{display:grid;gap:8px}
+  .opts.g5{grid-template-columns:repeat(5,1fr)}
+  .opts.g4{grid-template-columns:repeat(4,1fr)}
+  .opts.g7{grid-template-columns:repeat(7,1fr)}
+  @media (max-width:640px){.opts.g5,.opts.g4,.opts.g7{grid-template-columns:1fr}}
+  label.opt{display:flex;align-items:center;justify-content:center;text-align:center;gap:6px;
+    padding:10px 8px;border:1px solid var(--line);border-radius:10px;font-size:.85rem;
+    background:var(--panel2);cursor:pointer;transition:all .12s;min-height:44px}
+  label.opt:hover{border-color:var(--accent)}
+  label.opt input{display:none}
+  label.opt.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  .pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.78rem;font-weight:700}
+  .pill.low{background:rgba(95,214,138,.18);color:var(--good)}
+  .pill.mod{background:rgba(255,180,84,.2);color:var(--warn)}
+  .pill.high{background:rgba(255,107,129,.2);color:var(--bad)}
+  .scorebar{height:14px;border-radius:99px;background:var(--panel2);overflow:hidden;margin:8px 0}
+  .scorebar>i{display:block;height:100%;border-radius:99px}
+  table{width:100%;border-collapse:collapse;font-size:.9rem;margin:8px 0}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.03em}
+  .big{font-size:2.2rem;font-weight:800;line-height:1}
+  .kv{display:flex;gap:8px;align-items:baseline}
+  .muted{color:var(--muted)}
+  .hidden{display:none}
+  ul.tight{margin:6px 0;padding-left:20px} ul.tight li{margin:3px 0}
+  .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:640px){.demo-grid{grid-template-columns:1fr}}
+  select,input[type=text]{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);width:100%}
+  .footprint{font-size:.8rem;color:var(--muted);text-align:center;margin-top:30px}
+  .toc{display:grid;gap:8px;margin:12px 0}
+  .toc a{color:var(--accent);text-decoration:none}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:6px}
+  .swatch{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:5px}
+  details{margin:8px 0;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--panel2)}
+  summary{cursor:pointer;font-weight:600}
+  .anchor-warn{color:var(--bad);font-size:.85rem;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div class="logo">🧠</div>
+    <div>
+      <h1>Neurodivergence Screener</h1>
+      <p class="sub">A detailed, self-guided screening for ADHD &amp; autistic traits</p>
+    </div>
+  </header>
+
+  <!-- ============ INTRO ============ -->
+  <section id="intro">
+    <div class="card">
+      <h2>What this is</h2>
+      <p>This tool walks you through three well-established, publicly available screening
+      questionnaires used in research and clinical settings. It scores your answers, breaks the
+      results down by sub-area, and explains <em>why</em> each result came out the way it did.</p>
+      <table>
+        <tr><th>Instrument</th><th>Measures</th><th>Items</th></tr>
+        <tr><td><b>ASRS v1.1</b> (WHO)</td><td>Adult ADHD symptoms (inattention &amp; hyperactivity/impulsivity)</td><td>18</td></tr>
+        <tr><td><b>AQ-50</b> (Baron-Cohen)</td><td>Autistic traits across 5 domains</td><td>50</td></tr>
+        <tr><td><b>CAT-Q</b> (Hull)</td><td>Social camouflaging / "masking" of autistic traits</td><td>25</td></tr>
+      </table>
+      <p class="sub">93 questions total. Most people finish in 12–18 minutes. You can move at your own pace — progress is kept in your browser only.</p>
+
+      <div class="note danger" style="margin-top:16px">
+        <b>Important — this is a screener, not a diagnosis.</b> No questionnaire can diagnose ADHD
+        or autism. Only a qualified clinician can, through a full history, developmental
+        information, and ruling out other explanations (anxiety, depression, trauma, sleep, thyroid,
+        etc.). A high score means "traits worth exploring with a professional," not "you have this
+        condition." A low score does <em>not</em> rule anything out, especially for people who mask
+        heavily or were socialised to hide traits. Use these results as a starting point for a
+        conversation, never as a conclusion.
+      </div>
+      <div class="note warn" style="margin-top:10px">
+        If any question brings up distressing feelings, it's fine to stop. If you're in crisis,
+        contact a local emergency line or, in the US, call or text <b>988</b>.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>A little context (optional)</h3>
+      <p class="sub">Not scored — it only tailors a few notes in your results. Leave blank if you prefer.</p>
+      <div class="demo-grid" style="margin-top:10px">
+        <div>
+          <label class="muted" for="d-age">Age</label>
+          <input type="text" id="d-age" inputmode="numeric" placeholder="e.g. 29">
+        </div>
+        <div>
+          <label class="muted" for="d-sex">Sex assigned at birth</label>
+          <select id="d-sex">
+            <option value="">Prefer not to say</option>
+            <option value="f">Female</option>
+            <option value="m">Male</option>
+            <option value="i">Intersex</option>
+          </select>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:8px">Why ask? Autism and ADHD are historically under-diagnosed
+      in women, girls, and people assigned female at birth, partly because they tend to mask more.
+      We use this only to add a note, never to change your score.</p>
+    </div>
+
+    <div class="row">
+      <div class="spacer"></div>
+      <button id="startBtn">Begin the screening →</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz" class="hidden">
+    <div class="card" style="position:sticky;top:0;z-index:5">
+      <div class="row">
+        <div>
+          <h2 id="secTitle">Section</h2>
+          <p class="sub" id="secDesc"></p>
+        </div>
+        <div class="spacer"></div>
+        <span class="pill mod" id="secCount"></span>
+      </div>
+      <div class="progress"><i id="prog"></i></div>
+      <p class="sub" id="scaleHint"></p>
+    </div>
+
+    <div class="card">
+      <div class="qwrap" id="qwrap"></div>
+    </div>
+
+    <div class="row">
+      <button class="ghost" id="backBtn">← Back</button>
+      <div class="spacer"></div>
+      <span class="sub" id="answeredNote"></span>
+      <button id="nextBtn">Next section →</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results" class="hidden">
+    <div class="card">
+      <h2>Your results</h2>
+      <p class="sub" id="resIntro"></p>
+      <div class="note danger">Reminder: these are screening scores, not a diagnosis. Bring them to a clinician rather than treating them as an answer.</div>
+    </div>
+    <div id="resBody"></div>
+    <div class="card">
+      <h3>What to do next</h3>
+      <ul class="tight">
+        <li><b>If several scores were elevated:</b> consider talking to your GP/primary-care doctor,
+        a psychologist, or a psychiatrist about an assessment. Bring specific examples from daily
+        life, not just the numbers.</li>
+        <li><b>Write down real situations</b> — school reports, work feedback, childhood memories,
+        what people close to you notice. Assessors weigh lifelong, cross-situational patterns.</li>
+        <li><b>Masking matters:</b> a high CAT-Q with a "borderline" AQ can mean traits are real but
+        hidden through effort. Mention this to an assessor.</li>
+        <li><b>Co-occurrence is common:</b> ADHD and autism frequently overlap (often called AuDHD),
+        and both overlap with anxiety and depression. One elevated score doesn't exclude others.</li>
+      </ul>
+      <div class="row" style="margin-top:14px">
+        <button class="ghost" id="printBtn">🖨️ Save / print results</button>
+        <button class="ghost" id="restartBtn">↻ Start over</button>
+        <div class="spacer"></div>
+        <button id="detailsBtn">Show every answer &amp; scoring detail</button>
+      </div>
+      <div id="fullDetail" class="hidden"></div>
+    </div>
+  </section>
+
+  <p class="footprint">
+    Built from public-domain / freely-available research instruments (ASRS v1.1 © WHO/Harvard;
+    AQ © Autism Research Centre, Cambridge; CAT-Q © Hull et&nbsp;al. 2019). This app is for
+    education and self-reflection only and is not affiliated with those authors.
+  </p>
+</div>
+
+<script>
+/* ============================================================
+   DATA: the three instruments
+   ============================================================ */
+
+// ---- Response scales ----
+const SCALE_FREQ = { // ASRS
+  name:"How often has this happened over the past 6 months?",
+  cls:"g5",
+  opts:[
+    {t:"Never",v:0},{t:"Rarely",v:1},{t:"Sometimes",v:2},{t:"Often",v:3},{t:"Very Often",v:4}
+  ]
+};
+const SCALE_AGREE = { // AQ (agree..disagree), value stored 0..3, direction applied later
+  name:"How much do you agree?",
+  cls:"g4",
+  opts:[
+    {t:"Definitely agree",v:3},{t:"Slightly agree",v:2},{t:"Slightly disagree",v:1},{t:"Definitely disagree",v:0}
+  ]
+};
+const SCALE_LIK7 = { // CAT-Q
+  name:"Rate how true each statement is for you.",
+  cls:"g7",
+  opts:[
+    {t:"Strongly disagree",v:1},{t:"Disagree",v:2},{t:"Somewhat disagree",v:3},
+    {t:"Neither",v:4},{t:"Somewhat agree",v:5},{t:"Agree",v:6},{t:"Strongly agree",v:7}
+  ]
+};
+
+/* ---------- ASRS v1.1 (18 items) ----------
+   partA true = one of the 6 screener items.
+   sub: "IN"=inattention, "HI"=hyperactivity/impulsivity
+   partAThreshold: value at/above which the item counts as a positive screen box.
+*/
+const ASRS = {
+  id:"asrs", title:"Part 1 · Attention & Activity (ASRS)",
+  desc:"WHO Adult ADHD Self-Report Scale v1.1. Answer for the past 6 months.",
+  scale:SCALE_FREQ,
+  items:[
+    {t:"How often do you have trouble wrapping up the final details of a project, once the challenging parts have been done?", sub:"IN", partA:true, thr:2},
+    {t:"How often do you have difficulty getting things in order when you have to do a task that requires organization?", sub:"IN", partA:true, thr:2},
+    {t:"How often do you have problems remembering appointments or obligations?", sub:"IN", partA:true, thr:2},
+    {t:"When you have a task that requires a lot of thought, how often do you avoid or delay getting started?", sub:"IN", partA:true, thr:3},
+    {t:"How often do you fidget or squirm with your hands or feet when you have to sit down for a long time?", sub:"HI", partA:true, thr:3},
+    {t:"How often do you feel overly active and compelled to do things, like you were driven by a motor?", sub:"HI", partA:true, thr:3},
+    {t:"How often do you make careless mistakes when you have to work on a boring or difficult project?", sub:"IN"},
+    {t:"How often do you have difficulty keeping your attention when you are doing boring or repetitive work?", sub:"IN"},
+    {t:"How often do you have difficulty concentrating on what people say to you, even when they are speaking to you directly?", sub:"IN"},
+    {t:"How often do you misplace or have difficulty finding things at home or at work?", sub:"IN"},
+    {t:"How often are you distracted by activity or noise around you?", sub:"IN"},
+    {t:"How often do you leave your seat in meetings or other situations in which you are expected to remain seated?", sub:"HI"},
+    {t:"How often do you feel restless or fidgety?", sub:"HI"},
+    {t:"How often do you have difficulty unwinding and relaxing when you have time to yourself?", sub:"HI"},
+    {t:"How often do you find yourself talking too much when you are in social situations?", sub:"HI"},
+    {t:"When you're in a conversation, how often do you find yourself finishing the sentences of the people you are talking to, before they can finish them themselves?", sub:"HI"},
+    {t:"How often do you have difficulty waiting your turn in situations when turn taking is required?", sub:"HI"},
+    {t:"How often do you interrupt others when they are busy?", sub:"HI"}
+  ]
+};
+
+/* ---------- AQ-50 (Baron-Cohen 2001) ----------
+   dir: "A" => agreeing scores 1 (Definitely/Slightly agree)
+        "D" => disagreeing scores 1 (Definitely/Slightly disagree)
+   sub: SOC, SWI (attention switching), DET (attention to detail), COM, IMG
+*/
+const AQ = {
+  id:"aq", title:"Part 2 · Ways of Thinking & Relating (AQ-50)",
+  desc:"Autism-Spectrum Quotient. There are no right or wrong answers — go with your gut.",
+  scale:SCALE_AGREE,
+  items:[
+    {t:"I prefer to do things with others rather than on my own.", dir:"D", sub:"SOC"},
+    {t:"I prefer to do things the same way over and over again.", dir:"A", sub:"SWI"},
+    {t:"If I try to imagine something, I find it very easy to create a picture in my mind.", dir:"D", sub:"IMG"},
+    {t:"I frequently get so strongly absorbed in one thing that I lose sight of other things.", dir:"A", sub:"SWI"},
+    {t:"I often notice small sounds when others do not.", dir:"A", sub:"DET"},
+    {t:"I usually notice car number plates or similar strings of information.", dir:"A", sub:"DET"},
+    {t:"Other people frequently tell me that what I've said is impolite, even though I think it is polite.", dir:"A", sub:"COM"},
+    {t:"When I'm reading a story, I can easily imagine what the characters might look like.", dir:"D", sub:"IMG"},
+    {t:"I am fascinated by dates.", dir:"A", sub:"DET"},
+    {t:"In a social group, I can easily keep track of several different people's conversations.", dir:"D", sub:"SWI"},
+    {t:"I find social situations easy.", dir:"D", sub:"SOC"},
+    {t:"I tend to notice details that others do not.", dir:"A", sub:"DET"},
+    {t:"I would rather go to a library than a party.", dir:"A", sub:"SOC"},
+    {t:"I find making up stories easy.", dir:"D", sub:"IMG"},
+    {t:"I find myself drawn more strongly to people than to things.", dir:"D", sub:"SOC"},
+    {t:"I tend to have very strong interests, which I get upset about if I can't pursue.", dir:"A", sub:"SWI"},
+    {t:"I enjoy social chit-chat.", dir:"D", sub:"COM"},
+    {t:"When I talk, it isn't always easy for others to get a word in edgeways.", dir:"A", sub:"COM"},
+    {t:"I am fascinated by numbers.", dir:"A", sub:"DET"},
+    {t:"When I'm reading a story, I find it difficult to work out the characters' intentions.", dir:"A", sub:"IMG"},
+    {t:"I don't particularly enjoy reading fiction.", dir:"A", sub:"IMG"},
+    {t:"I find it hard to make new friends.", dir:"A", sub:"SOC"},
+    {t:"I notice patterns in things all the time.", dir:"A", sub:"DET"},
+    {t:"I would rather go to the theatre than a museum.", dir:"D", sub:"IMG"},
+    {t:"It does not upset me if my daily routine is disturbed.", dir:"D", sub:"SWI"},
+    {t:"I frequently find that I don't know how to keep a conversation going.", dir:"A", sub:"COM"},
+    {t:"I find it easy to “read between the lines” when someone is talking to me.", dir:"D", sub:"COM"},
+    {t:"I usually concentrate more on the whole picture, rather than the small details.", dir:"D", sub:"DET"},
+    {t:"I am not very good at remembering phone numbers.", dir:"D", sub:"DET"},
+    {t:"I don't usually notice small changes in a situation, or a person's appearance.", dir:"D", sub:"DET"},
+    {t:"I know how to tell if someone listening to me is getting bored.", dir:"D", sub:"COM"},
+    {t:"I find it easy to do more than one thing at once.", dir:"D", sub:"SWI"},
+    {t:"When I talk on the phone, I'm not sure when it's my turn to speak.", dir:"A", sub:"COM"},
+    {t:"I enjoy doing things spontaneously.", dir:"D", sub:"SWI"},
+    {t:"I am often the last to understand the point of a joke.", dir:"A", sub:"COM"},
+    {t:"I find it easy to work out what someone is thinking or feeling just by looking at their face.", dir:"D", sub:"SOC"},
+    {t:"If there is an interruption, I can switch back to what I was doing very quickly.", dir:"D", sub:"SWI"},
+    {t:"I am good at social chit-chat.", dir:"D", sub:"COM"},
+    {t:"People often tell me that I keep going on and on about the same thing.", dir:"A", sub:"COM"},
+    {t:"When I was young, I used to enjoy playing games involving pretending with other children.", dir:"D", sub:"IMG"},
+    {t:"I like to collect information about categories of things (e.g. types of car, types of bird, types of train, types of plant, etc.).", dir:"A", sub:"DET"},
+    {t:"I find it difficult to imagine what it would be like to be someone else.", dir:"A", sub:"IMG"},
+    {t:"I like to plan any activities I participate in carefully.", dir:"A", sub:"SWI"},
+    {t:"I enjoy social occasions.", dir:"D", sub:"SOC"},
+    {t:"I find it difficult to work out people's intentions.", dir:"A", sub:"SOC"},
+    {t:"New situations make me anxious.", dir:"A", sub:"SWI"},
+    {t:"I enjoy meeting new people.", dir:"D", sub:"SOC"},
+    {t:"I am a good diplomat.", dir:"D", sub:"SOC"},
+    {t:"I am not very good at remembering people's date of birth.", dir:"D", sub:"DET"},
+    {t:"I find it very easy to play games with children that involve pretending.", dir:"D", sub:"IMG"}
+  ]
+};
+
+/* ---------- CAT-Q (Hull 2019, 25 items) ----------
+   rev:true => reverse scored (8 - v)
+   sub: CMP (compensation), MSK (masking), ASM (assimilation)
+*/
+const CATQ = {
+  id:"catq", title:"Part 3 · Social Effort & Masking (CAT-Q)",
+  desc:"Camouflaging Autistic Traits Questionnaire. This asks about the effort you put into social situations — everyone's answers differ.",
+  scale:SCALE_LIK7,
+  items:[
+    {t:"When I am interacting with someone, I deliberately copy their body language or facial expressions.", sub:"CMP"},
+    {t:"I monitor my body language or facial expressions so that I appear relaxed.", sub:"MSK"},
+    {t:"I rarely feel the need to put on an act in order to get through a social situation.", sub:"ASM", rev:true},
+    {t:"I have developed a script to follow in social situations (for example, a list of questions or topics of conversation).", sub:"CMP"},
+    {t:"I will repeat phrases that I have heard others say in the exact same way that I first heard them.", sub:"CMP"},
+    {t:"I adjust my body language or facial expressions so that I appear interested by the person I am interacting with.", sub:"MSK"},
+    {t:"In social situations, I feel like I'm 'performing' rather than being myself.", sub:"ASM"},
+    {t:"In my own social interactions, I use behaviours that I have learned from watching other people interacting.", sub:"CMP"},
+    {t:"I always think about the impression I make on other people.", sub:"MSK"},
+    {t:"I need the support of other people in order to socialise.", sub:"ASM"},
+    {t:"I practise my facial expressions and body language to make sure they look natural.", sub:"CMP"},
+    {t:"I don't feel the need to make eye contact with other people if I don't want to.", sub:"MSK", rev:true},
+    {t:"I need to be prompted by other people in order to socialise.", sub:"ASM"},
+    {t:"I have researched the rules of social interactions (for example, by watching how other people interact) to improve my own social skills.", sub:"CMP"},
+    {t:"I am always aware of the impression I make on other people.", sub:"MSK"},
+    {t:"I feel free to be myself when I am with other people.", sub:"MSK", rev:true},
+    {t:"In social interactions, I use behaviours that I have learned by watching other people.", sub:"CMP"},
+    {t:"I have to force myself to interact with people when I am in social situations.", sub:"ASM"},
+    {t:"I have tried to improve my understanding of social skills by watching other people.", sub:"CMP"},
+    {t:"When in social situations, I try to find ways to avoid interacting with others.", sub:"ASM"},
+    {t:"I have to think about the impression I make on other people.", sub:"MSK"},
+    {t:"I have to concentrate to make eye contact in a social situation.", sub:"MSK"},
+    {t:"When talking to other people, I feel like the conversation flows naturally.", sub:"ASM", rev:true},
+    {t:"I have spent time learning social skills from television shows and books, and try to use these in my interactions.", sub:"CMP"},
+    {t:"In social situations, I feel like I am pretending to be 'normal'.", sub:"ASM"}
+  ]
+};
+
+const SECTIONS = [ASRS, AQ, CATQ];
+
+const SUB_LABELS = {
+  IN:"Inattention", HI:"Hyperactivity / Impulsivity",
+  SOC:"Social skill", SWI:"Attention switching", DET:"Attention to detail",
+  COM:"Communication", IMG:"Imagination",
+  CMP:"Compensation", MSK:"Masking", ASM:"Assimilation"
+};
+
+/* ============================================================
+   STATE + PERSISTENCE
+   ============================================================ */
+const STORE_KEY = "ndscreener_v1";
+let answers = {};   // key "sectionId-index" -> stored option value
+let demo = {age:"", sex:""};
+let curSection = 0;
+
+function save(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({answers,demo,curSection})); }catch(e){}
+}
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STORE_KEY)||"{}");
+    if(s.answers) answers = s.answers;
+    if(s.demo) demo = s.demo;
+    if(typeof s.curSection==="number") curSection = s.curSection;
+  }catch(e){}
+}
+
+/* ============================================================
+   RENDER QUIZ
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+function key(secId,i){ return secId+"-"+i; }
+
+function renderSection(){
+  const sec = SECTIONS[curSection];
+  $("secTitle").textContent = sec.title;
+  $("secDesc").textContent = sec.desc;
+  $("scaleHint").textContent = sec.scale.name;
+  $("secCount").textContent = "Section "+(curSection+1)+" of "+SECTIONS.length;
+
+  const wrap = $("qwrap");
+  wrap.innerHTML = "";
+  sec.items.forEach((item,i)=>{
+    const q = document.createElement("div");
+    q.className="q";
+    const kk = key(sec.id,i);
+    const stored = answers[kk];
+    let opts = "";
+    sec.scale.opts.forEach(o=>{
+      const sel = (stored!==undefined && stored===o.v) ? " sel" : "";
+      opts += `<label class="opt${sel}" data-k="${kk}" data-v="${o.v}">
+        <input type="radio" name="${kk}" ${sel?"checked":""}><span>${o.t}</span></label>`;
+    });
+    q.innerHTML = `<div class="qtext"><span class="qnum">${i+1}.</span><span>${item.t}</span></div>
+      <div class="opts ${sec.scale.cls}">${opts}</div>`;
+    wrap.appendChild(q);
+  });
+
+  // wire clicks
+  wrap.querySelectorAll("label.opt").forEach(l=>{
+    l.addEventListener("click",e=>{
+      const k = l.dataset.k, v = parseInt(l.dataset.v,10);
+      answers[k]=v;
+      // update selection styling in this group
+      wrap.querySelectorAll(`label.opt[data-k="${CSS.escape(k)}"]`).forEach(x=>x.classList.remove("sel"));
+      l.classList.add("sel");
+      save(); updateProgress();
+    });
+  });
+
+  $("backBtn").disabled = (curSection===0);
+  $("nextBtn").textContent = (curSection===SECTIONS.length-1) ? "See my results →" : "Next section →";
+  updateProgress();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function sectionAnswered(sec){
+  let n=0; sec.items.forEach((_,i)=>{ if(answers[key(sec.id,i)]!==undefined) n++; });
+  return n;
+}
+function totalAnswered(){
+  let n=0,t=0;
+  SECTIONS.forEach(sec=>{ t+=sec.items.length; n+=sectionAnswered(sec); });
+  return {n,t};
+}
+function updateProgress(){
+  const sec = SECTIONS[curSection];
+  const a = sectionAnswered(sec), t=sec.items.length;
+  const {n,t:tt} = totalAnswered();
+  $("prog").style.width = (100*n/tt)+"%";
+  $("answeredNote").textContent = a+" / "+t+" answered in this section";
+  $("nextBtn").disabled = false;
+}
+
+/* ============================================================
+   SCORING
+   ============================================================ */
+
+function scoreASRS(){
+  const s = ASRS;
+  let partAPos=0, IN=0, HI=0, total=0, anchors=[];
+  s.items.forEach((it,i)=>{
+    const v = answers[key(s.id,i)] ?? 0;
+    total += v;
+    if(it.sub==="IN") IN+=v; else HI+=v;
+    if(it.partA && v>=it.thr) partAPos++;
+    if(v>=3) anchors.push(i); // "often/very often" endorsements
+  });
+  return {partAPos, IN, HI, total, anchors};
+}
+
+function scoreAQ(){
+  const s = AQ;
+  const subs = {SOC:0,SWI:0,DET:0,COM:0,IMG:0};
+  let total=0;
+  s.items.forEach((it,i)=>{
+    const raw = answers[key(s.id,i)]; // 0..3 (3=def agree)
+    if(raw===undefined) return;
+    // dir A: agreeing scores -> raw>=2 (def/slight agree)
+    // dir D: disagreeing scores -> raw<=1 (def/slight disagree)
+    let pt = 0;
+    if(it.dir==="A") pt = (raw>=2)?1:0;
+    else pt = (raw<=1)?1:0;
+    total += pt; subs[it.sub]+=pt;
+  });
+  return {total, subs};
+}
+
+function scoreCATQ(){
+  const s = CATQ;
+  const subs = {CMP:0,MSK:0,ASM:0};
+  let total=0;
+  s.items.forEach((it,i)=>{
+    let v = answers[key(s.id,i)];
+    if(v===undefined) v = 4; // neutral if skipped
+    if(it.rev) v = 8 - v;
+    total += v; subs[it.sub]+=v;
+  });
+  return {total, subs};
+}
+
+/* band helpers */
+function band(pct){ return pct<0.4?"low":pct<0.7?"mod":"high"; }
+function pill(cls,label){ return `<span class="pill ${cls}">${label}</span>`; }
+function bar(pct,cls){
+  const col = cls==="high"?"var(--bad)":cls==="mod"?"var(--warn)":"var(--good)";
+  return `<div class="scorebar"><i style="width:${Math.min(100,Math.round(pct*100))}%;background:${col}"></i></div>`;
+}
+
+/* ============================================================
+   RENDER RESULTS
+   ============================================================ */
+function renderResults(){
+  $("quiz").classList.add("hidden");
+  $("intro").classList.add("hidden");
+  $("results").classList.remove("hidden");
+
+  const {n,t} = totalAnswered();
+  $("resIntro").textContent = `You answered ${n} of ${t} questions. Any skipped item was treated conservatively (ADHD: as “Never”; AQ: as a non-scoring answer; CAT-Q: as “Neither”). For the most accurate picture, go back and complete any you missed.`;
+
+  const body = $("resBody");
+  body.innerHTML = "";
+
+  /* ---- ASRS ---- */
+  const a = scoreASRS();
+  const partAFlag = a.partAPos>=4;
+  const totPct = a.total/72;
+  const inPct = a.IN/36, hiPct=a.HI/36;
+  const asrsBand = partAFlag ? "high" : (a.partAPos>=3?"mod":"low");
+  body.insertAdjacentHTML("beforeend", `
+    <div class="card">
+      <div class="row">
+        <h2>ADHD screen — ASRS v1.1</h2><div class="spacer"></div>
+        ${pill(asrsBand, partAFlag?"Consistent with ADHD":a.partAPos>=3?"Some indicators":"Below screen threshold")}
+      </div>
+      <div class="kv"><span class="big">${a.partAPos}/6</span><span class="muted">Part-A screener boxes checked</span></div>
+      <p class="sub">The 6 Part-A questions are the WHO's official screener. <b>4 or more</b> flagged
+      boxes means your symptoms are <b>highly consistent with adult ADHD</b> and worth a professional
+      assessment. Note the boxes aren't a simple "often" — items 1–3 count from "Sometimes" up, while
+      the more hyperactivity-flavoured items 4–6 only count from "Often" up, because those behaviours
+      are more specific to ADHD.</p>
+      <p><b>Your Part-A result:</b> ${partAFlag
+        ? `<span style="color:var(--bad)">${a.partAPos} boxes checked — at or above the threshold.</span> This is the single most predictive part of the whole ASRS.`
+        : `${a.partAPos} boxes checked — below the 4-box threshold.` }
+        ${(!partAFlag && a.partAPos===3)?" You're right on the edge; a couple of \"sometimes\" answers shifting to \"often\" would cross it.":""}</p>
+
+      <h3>The two symptom domains (all 18 items)</h3>
+      <table>
+        <tr><th>Domain</th><th>Score</th><th>Level</th></tr>
+        <tr><td>Inattention (9 items)</td><td>${a.IN} / 36</td><td>${pill(band(inPct),Math.round(inPct*100)+"%")}</td></tr>
+        <tr><td>Hyperactivity / Impulsivity (9 items)</td><td>${a.HI} / 36</td><td>${pill(band(hiPct),Math.round(hiPct*100)+"%")}</td></tr>
+        <tr><td><b>Total symptom load</b></td><td><b>${a.total} / 72</b></td><td>${pill(band(totPct),Math.round(totPct*100)+"%")}</td></tr>
+      </table>
+      ${bar(inPct,band(inPct))}${bar(hiPct,band(hiPct))}
+      <p class="sub"><b>Why this reading:</b> ${adhdNarrative(a,inPct,hiPct)}</p>
+      <details><summary>How ADHD presentations map onto this</summary>
+        <p class="sub">Clinicians describe three presentations: <b>predominantly inattentive</b>
+        (the "daydreamer" pattern — losing focus, disorganisation, forgetfulness), <b>predominantly
+        hyperactive-impulsive</b> (restlessness, interrupting, acting before thinking), and
+        <b>combined</b>. Your two bars above hint at which pattern is louder for you — but the ASRS
+        can't assign a presentation, and inattentive ADHD in particular is easy to miss because it's
+        quiet. Symptoms also must have been present since childhood and cause real-life impairment
+        to meet diagnostic criteria.</p>
+      </details>
+    </div>
+  `);
+
+  /* ---- AQ ---- */
+  const q = scoreAQ();
+  const aqPct = q.total/50;
+  const aqBand = q.total>=32?"high":q.total>=26?"mod":"low";
+  const aqLabel = q.total>=32?"Above clinical threshold":q.total>=26?"Elevated traits":"Below threshold";
+  const subRows = Object.keys(q.subs).map(k=>{
+    const p=q.subs[k]/10, b=band(p);
+    return `<tr><td>${SUB_LABELS[k]}</td><td>${q.subs[k]} / 10</td><td>${pill(b,Math.round(p*100)+"%")}</td></tr>`;
+  }).join("");
+  body.insertAdjacentHTML("beforeend",`
+    <div class="card">
+      <div class="row"><h2>Autistic-traits screen — AQ-50</h2><div class="spacer"></div>${pill(aqBand,aqLabel)}</div>
+      <div class="kv"><span class="big">${q.total}/50</span><span class="muted">total AQ score</span></div>
+      ${bar(aqPct,aqBand)}
+      <p class="sub">In Baron-Cohen's original study, <b>~80% of autistic adults scored 32 or above</b>,
+      versus very few non-autistic controls, so <b>32</b> is the commonly cited cut-off for "clinically
+      significant autistic traits worth following up." Scores of <b>26–31</b> are an in-between zone —
+      more traits than average, not over the research line. The AQ is a <em>traits</em> measure: many
+      people with high scores are not autistic, and some autistic people (especially those who mask)
+      score lower than expected.</p>
+      <p><b>Your total of ${q.total}</b> ${q.total>=32
+        ? "is at or above the 32 threshold — the level at which an assessment is typically recommended."
+        : q.total>=26 ? "sits in the elevated 26–31 band — noticeably above the typical average (~16 for non-autistic adults) but below the research cut-off."
+        : "is below both thresholds. The average non-autistic adult scores around 16."}</p>
+
+      <h3>Your five trait domains (10 items each)</h3>
+      <table><tr><th>Domain</th><th>Score</th><th>Strength of traits</th></tr>${subRows}</table>
+      <p class="sub"><b>Why this reading:</b> ${aqNarrative(q)}</p>
+      <details><summary>What each domain means</summary>
+        <ul class="tight">
+          <li><b>Social skill:</b> ease of social situations, making friends, reading people.</li>
+          <li><b>Attention switching:</b> flexibility, coping with change, shifting focus vs. deep absorption and routine.</li>
+          <li><b>Attention to detail:</b> noticing patterns, small sounds, numbers, fine detail others miss.</li>
+          <li><b>Communication:</b> back-and-forth conversation, reading between the lines, non-literal language.</li>
+          <li><b>Imagination:</b> pretend play, fiction, imagining others' minds and intentions.</li>
+        </ul>
+        <p class="sub">A "spiky profile" — high in some domains, average in others — is very typical of
+        autism. Attention-to-detail being high while social/communication are high too is a classic
+        shape; high detail alone is not specific to autism.</p>
+      </details>
+    </div>
+  `);
+
+  /* ---- CAT-Q ---- */
+  const c = scoreCATQ();
+  const catBand = c.total>=100?"high":c.total>=70?"mod":"low";
+  const catLabel = c.total>=100?"High camouflaging":c.total>=70?"Moderate camouflaging":"Lower camouflaging";
+  const catRows = Object.keys(c.subs).map(k=>{
+    const max = k==="CMP"?63:(k==="MSK"||k==="ASM"?56:56); // CMP 9 items, MSK 8, ASM 8
+    const p=c.subs[k]/max, b=band(p);
+    return `<tr><td>${SUB_LABELS[k]}</td><td>${c.subs[k]} / ${max}</td><td>${pill(b,Math.round(p*100)+"%")}</td></tr>`;
+  }).join("");
+  body.insertAdjacentHTML("beforeend",`
+    <div class="card">
+      <div class="row"><h2>Masking / camouflaging — CAT-Q</h2><div class="spacer"></div>${pill(catBand,catLabel)}</div>
+      <div class="kv"><span class="big">${c.total}/175</span><span class="muted">total camouflaging score</span></div>
+      ${bar(c.total/175,catBand)}
+      <p class="sub">Camouflaging means the conscious and unconscious strategies people use to hide
+      autistic traits and appear "neurotypical" — copying others, scripting conversations, forcing eye
+      contact, monitoring every expression. It's exhausting and linked to burnout, anxiety, and late
+      or missed diagnosis. A total around <b>100+</b> is often used as an indicative high-camouflaging
+      marker (Hull et al. found autistic adults averaged ~124). This scale doesn't screen for autism —
+      it explains <em>why a screen might understate real traits.</em></p>
+      <h3>Three camouflaging strategies</h3>
+      <table><tr><th>Strategy</th><th>Score</th><th>Level</th></tr>${catRows}</table>
+      <p class="sub"><b>Why this reading:</b> ${catNarrative(c)}</p>
+      <details><summary>What each strategy means</summary>
+        <ul class="tight">
+          <li><b>Compensation:</b> actively working around social difficulties — scripts, researched
+          rules, mimicking learned behaviours.</li>
+          <li><b>Masking:</b> hiding autistic characteristics — managing body language, forcing eye
+          contact, monitoring the impression you make.</li>
+          <li><b>Assimilation:</b> the pressure to fit in and "pass" — feeling like you're performing
+          or pretending to be normal, needing others to socialise.</li>
+        </ul>
+      </details>
+    </div>
+  `);
+
+  /* ---- Combined synthesis ---- */
+  body.insertAdjacentHTML("beforeend", synthesis(a,q,c,partAFlag));
+
+  window.scrollTo({top:0,behavior:"smooth"});
+  save();
+}
+
+/* ---- narrative generators ---- */
+function adhdNarrative(a,inPct,hiPct){
+  let s="";
+  if(a.partAPos>=4){
+    s += "Your Part-A screener is positive, which is the result that carries the most weight — it's the piece validated to predict a clinical ADHD picture. ";
+  } else if(a.partAPos===3){
+    s += "Your Part-A screener is just under the line, so the ASRS neither flags nor clears you — a genuinely borderline result. ";
+  } else {
+    s += "Your Part-A screener is below threshold, meaning the core predictive items didn't cluster. ";
+  }
+  const diff = inPct - hiPct;
+  if(Math.abs(diff)<0.12) s += "Your inattention and hyperactivity/impulsivity loads are similar, a pattern more like combined-type symptoms.";
+  else if(diff>0) s += "Inattention is clearly the louder domain for you — the quieter, easily-overlooked side of ADHD (losing focus, disorganisation, forgetfulness) rather than visible restlessness.";
+  else s += "Hyperactivity/impulsivity is the louder domain for you — restlessness, interrupting, acting before thinking outweigh the attention items.";
+  if(a.total>=48) s += " Overall symptom load is high across the board.";
+  return s;
+}
+function aqNarrative(q){
+  const entries = Object.entries(q.subs).sort((x,y)=>y[1]-x[1]);
+  const hi = entries.filter(e=>e[1]>=6).map(e=>SUB_LABELS[e[0]]);
+  const lo = entries.filter(e=>e[1]<=3).map(e=>SUB_LABELS[e[0]]);
+  let s = `Your strongest trait domains are ${entries.slice(0,2).map(e=>SUB_LABELS[e[0]].toLowerCase()).join(" and ")}. `;
+  if(hi.length>=2) s += `Multiple domains (${hi.join(", ").toLowerCase()}) are elevated together, which is more meaningful than any single high area. `;
+  else if(hi.length===1) s += `${hi[0]} stands out most. `;
+  if(lo.length) s += `${lo.join(" and ")} came out closer to typical, giving you the "spiky" profile common in autism rather than a flat elevation. `;
+  if(q.total>=32) s += "Because several domains stack up to cross 32, this is the kind of profile clinicians follow up.";
+  else if(q.total>=26) s += "The total lands in the elevated-but-sub-threshold band — worth watching, especially alongside your masking score.";
+  else s += "The overall pattern is below the threshold used to recommend follow-up.";
+  return s;
+}
+function catNarrative(c){
+  const entries = Object.entries(c.subs).sort((x,y)=>y[1]-x[1]);
+  const top = SUB_LABELS[entries[0][0]].toLowerCase();
+  let s = `Your dominant strategy is ${top}. `;
+  if(c.total>=100) s += "The overall level is high — this much effort to appear neurotypical is itself significant, and it's exactly the pattern that causes autism to be missed on face-value screens. If your AQ was borderline, this suggests the traits may be real but well-hidden.";
+  else if(c.total>=70) s += "You're putting moderate, deliberate effort into social situations — more than someone who finds them effortless, less than the heavy-masking range.";
+  else s += "Overall camouflaging is on the lower side, suggesting you don't rely heavily on hiding or scripting to get through social situations.";
+  return s;
+}
+
+function synthesis(a,q,c,partAFlag){
+  const adhd = partAFlag;
+  const aut = q.total>=32;
+  const autMaybe = q.total>=26;
+  const highMask = c.total>=100;
+  let headline="", cls="mod";
+  if(adhd && aut){ headline="Both screens are elevated (a combined ADHD + autism profile, sometimes called AuDHD, is common)."; cls="high"; }
+  else if(adhd && !autMaybe){ headline="The ADHD screen is elevated while the autism screen is not."; cls="high"; }
+  else if(!adhd && aut){ headline="The autism screen is elevated while the ADHD screen is not."; cls="high"; }
+  else if(adhd && autMaybe){ headline="The ADHD screen is elevated and autistic traits are in the borderline zone."; cls="high"; }
+  else if(autMaybe || a.partAPos===3){ headline="Results are in a borderline / mixed zone rather than clearly high or low."; cls="mod"; }
+  else { headline="Neither screen crossed its main threshold."; cls="low"; }
+
+  let extra="";
+  if(highMask && (autMaybe && !aut)) extra += "<li>Your <b>high masking score paired with a borderline AQ</b> is worth flagging to an assessor — heavy camouflaging can pull an AQ down below where it 'should' sit.</li>";
+  if(adhd && aut) extra += "<li>ADHD and autism co-occur often and share surface features (focus problems, social fatigue, sensory sensitivity) but for different underlying reasons. A good assessment teases them apart rather than forcing one label.</li>";
+  if(!adhd && !autMaybe) extra += "<li>Low scores don't rule things out — situational demands, coping strategies, mood, and masking all affect answers. Trust your lived experience over a single sitting of a questionnaire.</li>";
+
+  // demographic note
+  let demoNote="";
+  if(demo.sex==="f" && (autMaybe||highMask||a.partAPos>=3)){
+    demoNote = `<div class="note warn" style="margin-top:12px">Because you noted female sex assigned at birth: ADHD and autism are substantially under-recognised in women and girls, who more often present with inattentive ADHD and heavier masking. Borderline scores in this group are a common reason people are missed for years — take them seriously rather than dismissing them.</div>`;
+  }
+
+  return `
+    <div class="card">
+      <div class="row"><h2>Putting it together</h2><div class="spacer"></div>${pill(cls,"Synthesis")}</div>
+      <p><b>${headline}</b></p>
+      <table>
+        <tr><th>Screen</th><th>Key number</th><th>Read</th></tr>
+        <tr><td>ADHD (ASRS Part A)</td><td>${a.partAPos}/6 boxes</td><td>${partAFlag?pill("high","Positive"):a.partAPos>=3?pill("mod","Borderline"):pill("low","Negative")}</td></tr>
+        <tr><td>Autism (AQ-50)</td><td>${q.total}/50</td><td>${q.total>=32?pill("high","Above 32"):q.total>=26?pill("mod","Elevated"):pill("low","Below")}</td></tr>
+        <tr><td>Masking (CAT-Q)</td><td>${c.total}/175</td><td>${c.total>=100?pill("high","High"):c.total>=70?pill("mod","Moderate"):pill("low","Lower")}</td></tr>
+      </table>
+      <ul class="tight">
+        <li><b>How to weigh this:</b> the strongest single signal is the ASRS Part-A box count for ADHD and the total for the AQ. Sub-scores tell you the <em>shape</em>; totals and thresholds tell you whether to follow up.</li>
+        ${extra}
+      </ul>
+      ${demoNote}
+    </div>`;
+}
+
+/* ---- full answer dump ---- */
+function renderFullDetail(){
+  const el = $("fullDetail");
+  let html = `<div style="margin-top:16px"><h3>Every question, your answer, and how it scored</h3>`;
+  SECTIONS.forEach(sec=>{
+    html += `<h3>${sec.title}</h3><table><tr><th>#</th><th>Question</th><th>Answer</th><th>Points</th></tr>`;
+    sec.items.forEach((it,i)=>{
+      const raw = answers[key(sec.id,i)];
+      let ans = raw===undefined?"—":(sec.scale.opts.find(o=>o.v===raw)?.t ?? raw);
+      let pts="";
+      if(sec.id==="asrs"){
+        const v = raw??0; pts = v + (it.partA? (v>=it.thr?" ✅box":" (box not met)"):"");
+      } else if(sec.id==="aq"){
+        let pt=0; if(raw!==undefined){ pt = it.dir==="A"?(raw>=2?1:0):(raw<=1?1:0);} pts = pt+" pt";
+      } else {
+        let v = raw===undefined?4:raw; if(it.rev) v=8-v; pts = v + (it.rev?" (rev)":"");
+      }
+      html += `<tr><td>${i+1}</td><td style="font-weight:500">${it.t}</td><td>${ans}</td><td>${pts}</td></tr>`;
+    });
+    html += `</table>`;
+  });
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+/* ============================================================
+   NAV / EVENTS
+   ============================================================ */
+$("startBtn").addEventListener("click",()=>{
+  demo.age = $("d-age").value.trim();
+  demo.sex = $("d-sex").value;
+  save();
+  $("intro").classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  curSection = 0; save();
+  renderSection();
+});
+$("nextBtn").addEventListener("click",()=>{
+  if(curSection < SECTIONS.length-1){ curSection++; save(); renderSection(); }
+  else { renderResults(); }
+});
+$("backBtn").addEventListener("click",()=>{
+  if(curSection>0){ curSection--; save(); renderSection(); }
+});
+$("restartBtn").addEventListener("click",()=>{
+  if(confirm("Clear all answers and start over?")){
+    answers={}; demo={age:"",sex:""}; curSection=0;
+    try{localStorage.removeItem(STORE_KEY);}catch(e){}
+    $("results").classList.add("hidden");
+    $("intro").classList.remove("hidden");
+    $("d-age").value=""; $("d-sex").value="";
+  }
+});
+$("printBtn").addEventListener("click",()=>window.print());
+$("detailsBtn").addEventListener("click",()=>{
+  const el=$("fullDetail");
+  if(el.classList.contains("hidden")){ renderFullDetail(); el.classList.remove("hidden"); $("detailsBtn").textContent="Hide detail"; }
+  else { el.classList.add("hidden"); $("detailsBtn").textContent="Show every answer & scoring detail"; }
+});
+
+/* restore prior session */
+load();
+if($("d-age")) $("d-age").value = demo.age||"";
+if($("d-sex")) $("d-sex").value = demo.sex||"";
+</script>
+</body>
+</html>
