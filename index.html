@@ -169,6 +169,7 @@
     </div>
 
     <div class="card">
+      <div class="note" id="secFrame" style="margin-bottom:18px"></div>
       <div class="qwrap" id="qwrap"></div>
     </div>
 
@@ -254,7 +255,8 @@ const SCALE_LIK7 = { // CAT-Q
 */
 const ASRS = {
   id:"asrs", title:"Part 1 · Attention & Activity (ASRS)",
-  desc:"WHO Adult ADHD Self-Report Scale v1.1. Answer for the past 6 months.",
+  desc:"WHO Adult ADHD Self-Report Scale v1.1 — the ADHD screener. Answer for the past 6 months.",
+  frame:"A note on how this part reads: every item here describes a possible difficulty and asks how often it happens. That one-directional style is built into the official ADHD screener — it isn't trying to corner you, and it's completely normal to recognise several of these (nearly everyone does some of them sometimes). The score doesn't react to any single “often”; it weighs the overall pattern and whether it's frequent and genuinely gets in your way. Answer for how things actually are, not how you think they should be.",
   scale:SCALE_FREQ,
   items:[
     {t:"How often do you have trouble wrapping up the final details of a project, once the challenging parts have been done?", sub:"IN", partA:true, thr:2},
@@ -285,7 +287,8 @@ const ASRS = {
 */
 const AQ = {
   id:"aq", title:"Part 2 · Ways of Thinking & Relating (AQ-50)",
-  desc:"Autism-Spectrum Quotient. There are no right or wrong answers — go with your gut.",
+  desc:"Autism-Spectrum Quotient — the autism-traits screener. There are no right or wrong answers.",
+  frame:"This part is built to be hard to lead: on purpose, it flips the direction of the questions. For some, agreeing points toward autistic traits; for others, disagreeing does — so there's no consistent “right-looking” answer to drift toward. Just answer each one honestly and don't try to keep your answers consistent with each other.",
   scale:SCALE_AGREE,
   items:[
     {t:"I prefer to do things with others rather than on my own.", dir:"D", sub:"SOC"},
@@ -348,6 +351,7 @@ const AQ = {
 const CATQ = {
   id:"catq", title:"Part 3 · Social Effort & Masking (CAT-Q)",
   desc:"Camouflaging Autistic Traits Questionnaire. This asks about the effort you put into social situations — everyone's answers differ.",
+  frame:"There are no desirable or undesirable answers here. People vary enormously in how much conscious effort they put into socialising, and a high or a low score just describes a style, not a problem. Answer for your typical experience.",
   scale:SCALE_LIK7,
   items:[
     {t:"When I am interacting with someone, I deliberately copy their body language or facial expressions.", sub:"CMP"},
@@ -418,6 +422,8 @@ function renderSection(){
   const sec = SECTIONS[curSection];
   $("secTitle").textContent = sec.title;
   $("secDesc").textContent = sec.desc;
+  $("secFrame").innerHTML = sec.frame || "";
+  $("secFrame").style.display = sec.frame ? "block" : "none";
   $("scaleHint").textContent = sec.scale.name;
   $("secCount").textContent = "Section "+(curSection+1)+" of "+SECTIONS.length;
 
