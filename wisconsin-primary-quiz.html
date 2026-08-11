@@ -67,9 +67,9 @@
     font-family:"Franklin Gothic Medium","Libre Franklin","Trebuchet MS","Segoe UI",Arial,sans-serif;
     line-height:1.55;
     font-size:16px;
+    -webkit-text-size-adjust:100%;
   }
-  .wrap{max-width:760px;margin:0 auto;padding:24px 20px 96px}
-  /* ballot header */
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 96px}
   header.ballot{
     border-top:6px solid var(--rule-heavy);
     border-bottom:2px solid var(--rule-heavy);
@@ -115,41 +115,70 @@
   .track{height:5px;background:var(--bar-track);border-radius:3px;margin-top:6px;overflow:hidden}
   .fill{height:100%;width:0%;background:var(--navy);border-radius:3px;transition:width .25s ease}
   @media (prefers-reduced-motion: reduce){ .fill{transition:none} }
-  /* questions */
+  /* statement cards */
   .q{
     border:1px solid var(--rule);
     border-top:3px solid var(--rule-heavy);
     background:var(--paper-raised);
     border-radius:0 0 8px 8px;
-    padding:16px 18px 12px;
+    padding:16px 14px 10px;
     margin:0 0 22px;
+    min-width:0;
   }
   .q .tag{
     font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);
     font-weight:700;margin:0 0 4px;
   }
-  .q h2{font-size:18px;margin:0 0 12px;line-height:1.35;text-wrap:balance}
-  .opt{display:block;position:relative;padding:10px 12px 10px 52px;border-radius:6px;cursor:pointer;font-size:15.5px}
-  .opt + .opt{border-top:1px dashed var(--rule)}
-  .opt:hover{background:var(--navy-soft)}
-  .opt input{position:absolute;opacity:0;pointer-events:none}
-  /* the ballot oval */
-  .opt .oval{
-    position:absolute;left:12px;top:12px;
-    width:26px;height:15px;border-radius:50%;
-    border:2px solid var(--ink);
-    background:transparent;
+  .q h2{font-size:18px;margin:0 0 6px;line-height:1.4;text-wrap:balance;font-weight:600}
+  /* likert scale */
+  .likert{
+    display:flex;align-items:stretch;justify-content:space-between;
+    position:relative;margin:6px 0 2px;
   }
-  .opt input:checked ~ .oval{background:var(--ink)}
-  .opt input:focus-visible ~ .oval{outline:3px solid var(--focus);outline-offset:2px}
-  .opt input:checked ~ .opt-text{font-weight:600}
+  .likert::before{
+    content:"";position:absolute;left:10%;right:10%;top:34px;
+    border-top:2px dashed var(--rule);
+  }
+  .lk{
+    position:relative;z-index:1;
+    flex:1 1 0;min-width:0;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    padding:12px 2px 10px;
+    min-height:72px;
+    border-radius:8px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  @media (hover:hover){ .lk:hover{background:var(--navy-soft)} }
+  .lk input{position:absolute;opacity:0;pointer-events:none}
+  .lk .dot{
+    display:block;border:2.5px solid var(--ink);border-radius:50%;
+    background:var(--paper-raised);
+    transition:background .12s ease;
+  }
+  @media (prefers-reduced-motion: reduce){ .lk .dot{transition:none} }
+  /* graduated ballot-oval sizes: big at the ends, small in the middle */
+  .lk .d0,.lk .d4{width:40px;height:24px;margin-top:8px}
+  .lk .d1,.lk .d3{width:33px;height:20px;margin-top:11px}
+  .lk .d2{width:27px;height:17px;margin-top:13px}
+  .lk input:checked ~ .dot{background:var(--ink)}
+  .lk input:focus-visible ~ .dot{outline:3px solid var(--focus);outline-offset:3px}
+  .lk .lklab{
+    font-size:11px;line-height:1.25;text-align:center;color:var(--ink-soft);
+    letter-spacing:.02em;max-width:9ch;
+  }
+  .lk input:checked ~ .lklab{color:var(--ink);font-weight:700}
+  @media (max-width:430px){
+    .lk .lklab{font-size:10px;max-width:8ch}
+    .lk{padding:12px 1px 8px}
+  }
   /* count button */
   .countrow{text-align:center;margin:34px 0 10px}
   button.count{
     font:inherit;font-weight:700;letter-spacing:.05em;
     background:var(--navy);color:var(--paper);
     border:none;border-radius:8px;
-    padding:14px 34px;font-size:17px;cursor:pointer;
+    padding:16px 34px;font-size:17px;cursor:pointer;
+    width:100%;max-width:420px;min-height:52px;
   }
   button.count:hover{filter:brightness(1.12)}
   button.count:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
@@ -171,14 +200,14 @@
   .party-pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
   .pill-d{background:var(--dem-bg);color:var(--dem)}
   .pill-r{background:var(--rep-bg);color:var(--rep)}
-  .race{border:1px solid var(--rule);border-radius:8px;background:var(--paper-raised);padding:16px 18px;margin:0 0 18px}
+  .race{border:1px solid var(--rule);border-radius:8px;background:var(--paper-raised);padding:16px 16px;margin:0 0 18px}
   .race h3{margin:0 0 2px;font-size:17px}
   .race .rnote{font-size:13px;color:var(--ink-soft);margin:0 0 12px}
   .cand{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding:9px 0;border-top:1px dashed var(--rule)}
   .cand:first-of-type{border-top:none}
   .cand .score{
     font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;
-    min-width:64px;color:var(--ink-soft);padding-top:2px;
+    min-width:60px;color:var(--ink-soft);padding-top:2px;
   }
   .cand .name{font-weight:700;font-size:15.5px}
   .cand .why{grid-column:2;font-size:14px;color:var(--ink-soft)}
@@ -186,7 +215,7 @@
   .cand .bar i{display:block;height:100%;background:var(--navy);border-radius:3px}
   .cand.top .name::after{
     content:"YOUR MATCH";margin-left:10px;font-size:10.5px;letter-spacing:.12em;
-    background:var(--navy);color:var(--paper);padding:2px 8px;border-radius:3px;vertical-align:2px;
+    background:var(--navy);color:var(--paper);padding:2px 8px;border-radius:3px;vertical-align:2px;white-space:nowrap;
   }
   .warn{
     background:var(--warn-bg);border-left:4px solid var(--warn-edge);
@@ -214,7 +243,7 @@
 <header class="ballot">
   <p class="eyebrow">Wisconsin Partisan Primary · Tuesday, August 11, 2026</p>
   <h1>What do you actually care about?<br>A ballot quiz for Rib Mountain.</h1>
-  <p class="subhead">Nineteen questions about your priorities, scored against every contested race on the official sample ballot for Rib Mountain V, Wards 1–10 (Marathon County) — the ballot style for 223501 Magnolia Ave.</p>
+  <p class="subhead">Twenty statements. Rate each from strongly disagree to strongly agree, and your answers are scored against every contested race on the official sample ballot for Rib Mountain V, Wards 1–10 (Marathon County) — the ballot style for 223501 Magnolia Ave.</p>
 </header>
 <div class="metaline">
   <span>Polls <b>7 AM – 8 PM</b></span>
@@ -223,10 +252,10 @@
   <span>Confirm at <b>myvote.wi.gov</b></span>
 </div>
 
-<p class="instructions"><strong>How Wisconsin primaries work:</strong> you may vote in only <strong>one party's column</strong> — Democratic or Republican, not both. This quiz first figures out which ballot fits your views, then ranks the candidates in each contested race on that ballot. Answer honestly; skip anything you truly don't care about.</p>
+<p class="instructions"><strong>How Wisconsin primaries work:</strong> you may vote in only <strong>one party's column</strong> — Democratic or Republican, not both. This quiz first figures out which ballot fits your views, then ranks the candidates in each contested race on that ballot. <strong>Fill one oval per statement</strong> — the big ovals are strong feelings, the small middle oval is neutral. Skip anything you truly have no opinion on.</p>
 
 <div class="progress" aria-hidden="true">
-  <div class="row"><span>Ovals filled</span><span class="count" id="pcount">0 / 19</span></div>
+  <div class="row"><span>Ovals filled</span><span class="count" id="pcount">0 / 20</span></div>
   <div class="track"><div class="fill" id="pfill"></div></div>
 </div>
 
@@ -234,7 +263,7 @@
 
 <div class="countrow">
   <button type="button" class="count" id="countBtn">Count my ballot</button>
-  <p class="countnote" id="countNote">Answer at least 12 of 19 questions for a reliable result.</p>
+  <p class="countnote" id="countNote">Rate at least 12 of 20 statements for a reliable result.</p>
 </div>
 
 <div id="results" aria-live="polite"></div>
@@ -301,99 +330,69 @@ const UNCONTESTED = {
      ["Clerk of Circuit Court","Kelly Schremp (incumbent)"]]
 };
 
-// d/r = party-lean points; p = candidate points
+// Likert statements. a = payload when you AGREE, dis = payload when you DISAGREE,
+// n = payload for the NEUTRAL middle (optional). d/r = party-lean points, p = candidate points.
+// Strongly agree/disagree applies the payload at full weight; plain agree/disagree at half.
 const Q = [
- {tag:"Values · Abortion",q:"Abortion law in Wisconsin should…",o:[
-   {t:"Protect and expand access, in statute or the state constitution",d:2,p:{roys:2,hong:1}},
-   {t:"Stay where the courts have left it — not a priority for me",},
-   {t:"Be more restrictive",r:2,p:{varnam:1,ebben:1}}]},
- {tag:"Values · Taxes",q:"On state taxes, Wisconsin should…",o:[
-   {t:"Raise them on top earners and corporations to fund schools and services",d:2,p:{hong:2,crowley:1,roys:1}},
-   {t:"Hold the line overall, with targeted relief (property taxes, families)",d:.5,p:{brennan:1,crowley:1,murray:1}},
-   {t:"Cut or freeze them across the board",r:2,p:{tiffany:1,varnam:2,martin:1}}]},
- {tag:"Values · Economy",q:"The state's role in the economy should be…",o:[
-   {t:"Go big: $20 minimum wage, universal child care, public options",d:2,p:{hong:2,roys:1}},
-   {t:"Pragmatic and incremental: partnerships, job training, small-business help",d:1,p:{crowley:2,brennan:2}},
-   {t:"Get out of the way: deregulate and let markets lower costs",r:2,p:{tiffany:2,martin:2,baum:1}}]},
- {tag:"Values · Immigration",q:"On immigration enforcement…",o:[
-   {t:"Limit local cooperation with ICE and protect immigrant communities",d:2,p:{hong:2,roys:1,brennan:1}},
-   {t:"Secure the border with a fair, orderly legal process",p:{clark:1,murray:1}},
-   {t:"Full crackdown — back ICE and local enforcement completely",r:2,p:{ebben:2,alfonso:1,tiffany:1}}]},
- {tag:"Values · Endorsements",q:"A Donald Trump endorsement is…",o:[
-   {t:"A strong point in a candidate's favor",r:2,p:{alfonso:2,tiffany:1,ebben:1}},
-   {t:"Not a factor — I judge candidates on their own merits",p:{hermening:1,baum:1,raihala:1}},
-   {t:"A red flag",d:2,p:{armstrong:1}}]},
- {tag:"Values · Elections",q:"How Wisconsin runs its elections…",o:[
-   {t:"Works well — protect access and keep voting convenient",d:2},
-   {t:"Needs modest tightening — stricter audits and ID, but keep the machines",r:1,p:{pollnow:1}},
-   {t:"Needs an overhaul — hand counts, abolish the elections commission, restrict mail voting",r:2,p:{myer:2,schroeder:2}}]},
- {tag:"Values · Marijuana",q:"Marijuana in Wisconsin should be…",o:[
-   {t:"Legal for adults",d:1.5,p:{hong:1}},
-   {t:"Medical use only"},
-   {t:"Kept illegal",r:1.5}]},
- {tag:"Values · Energy",q:"Wisconsin's energy future should prioritize…",o:[
-   {t:"Accelerating clean energy and protecting air and water",d:2,p:{clark:1,murray:1}},
-   {t:"An all-of-the-above mix",p:{martin:1}},
-   {t:"Traditional energy first — I'm skeptical of big wind and solar projects",r:2,p:{ebben:2}}]},
- {tag:"Local issue · Data centers",q:"Big AI data centers want to build in Wisconsin. The state should…",o:[
-   {t:"Pause them until strong rules exist — or let towns vote to block them",d:.5,p:{hong:2,raihala:2}},
-   {t:"Allow them, but make them pay their own power, water and grid costs",p:{crowley:1,brennan:1,clark:1,baum:2}},
-   {t:"Welcome them — the jobs and investment come first",r:1,p:{tiffany:1,martin:1,alfonso:1}}]},
- {tag:"Values · Healthcare",q:"On healthcare, I most want…",o:[
-   {t:"A state public option or universal coverage",d:2,p:{roys:2,clark:2,hong:1}},
-   {t:"Step-by-step expansion: BadgerCare/Medicaid, rural hospitals, drug prices",d:1,p:{crowley:1,brennan:1,murray:1,hong:1}},
-   {t:"More market competition and less regulation to cut costs",r:2,p:{tiffany:2,hermening:1}}]},
- {tag:"Values · Education",q:"K-12 education money should…",o:[
-   {t:"Boost public schools and phase out private-school vouchers",d:2,p:{hong:2,roys:2,murray:1}},
-   {t:"Fund public schools AND keep choice programs",r:1,p:{tiffany:1,martin:1}},
-   {t:"Expand school choice and vouchers",r:2,p:{varnam:2}}]},
- {tag:"Local issue · Housing",q:"Housing affordability is best fixed by…",o:[
-   {t:"Public investment in affordable housing",d:1.5,p:{crowley:2,brennan:2}},
-   {t:"Cutting zoning rules and red tape so builders can build",r:1.5,p:{baum:2,raihala:1,martin:1,hermening:1}},
-   {t:"Both, aggressively",d:.5,r:.5,p:{brennan:1,baum:1}}]},
- {tag:"Style · Background",q:"The background I most want in a candidate:",o:[
-   {t:"Proven experience in office — knows how to govern",p:{crowley:2,clark:2,roys:1,tiffany:1,hermening:1,martin:1}},
-   {t:"An outsider with the energy to shake things up",p:{hong:1,armstrong:2,ebben:1,alfonso:1,baum:1,varnam:1}},
-   {t:"Deep roots right here in north-central Wisconsin",p:{murray:1,hermening:2,ebben:1,xiong:2,clark:1}}]},
- {tag:"Local issue · Rural Wisconsin",q:"For rural Wisconsin, the bigger emergency is…",o:[
-   {t:"Hospitals and healthcare deserts",p:{hong:1,roys:1,murray:1}},
-   {t:"Jobs — farms, forestry, manufacturing",p:{clark:2,alfonso:2,ebben:1}},
-   {t:"Housing and the cost of living",p:{baum:1,hermening:1,crowley:1,brennan:1}}]},
- {tag:"Values · Labor",q:"On unions and wages…",o:[
-   {t:"Restore public-employee collective bargaining and raise the minimum wage",d:2,p:{roys:2,hong:1,crowley:1}},
-   {t:"Government should stay out — wages are between employers and workers",r:2,p:{tiffany:1}},
-   {t:"Support unions, but skip new mandates",d:.5,p:{crowley:1,brennan:1}}]},
- {tag:"Values · Culture",q:"Cultural fights (school sports rules, curriculum battles) are…",o:[
-   {t:"Real issues legislators should act on",r:2,p:{varnam:2}},
-   {t:"A distraction from kitchen-table issues",d:1,p:{martin:1,baum:1,murray:1,crowley:1}},
-   {t:"Important, but not government's job",r:.5}]},
- {tag:"Down-ballot · Treasurer",q:"Wisconsin's State Treasurer should be…",o:[
-   {t:"A lean watchdog: transparency, guard the school trust fund from politics",p:{helmenstine:2}},
-   {t:"An active builder: grow the fund, community loans, financial literacy",p:{xiong:2}},
-   {t:"No strong opinion"}]},
- {tag:"Federal · Budget",q:"On the federal budget, Congress should…",o:[
-   {t:"Cut spending hard to fight inflation",r:2,p:{hermening:2,alfonso:1,raihala:1}},
-   {t:"Cut fraud and waste, but protect the big programs",r:.5,p:{alfonso:2,baum:1}},
-   {t:"Invest more — and tax the wealthy to pay for it",d:2,p:{armstrong:1}}]},
- {tag:"Federal · Oversight",q:"Congress's posture toward the Trump administration should be…",o:[
-   {t:"Aggressive oversight — challenge actions that overstep the Constitution",d:2,p:{armstrong:2,brennan:1,clark:1}},
-   {t:"Partnership — work with it to deliver for Wisconsin",r:2,p:{alfonso:1,ebben:1,tiffany:1}},
-   {t:"Case by case",p:{baum:1,murray:1,hermening:1}}]}
+ {tag:"Abortion",s:"Abortion access in Wisconsin should be protected and expanded — in statute or the state constitution.",
+  a:{d:2,p:{roys:2,hong:1}}, dis:{r:2,p:{varnam:1,ebben:1}}},
+ {tag:"Taxes",s:"Wisconsin should raise taxes on top earners and corporations to fund schools and services.",
+  a:{d:2,p:{hong:2,crowley:1,roys:1}}, n:{d:.5,p:{brennan:1,crowley:1,murray:1}}, dis:{r:2,p:{tiffany:1,varnam:2,martin:1}}},
+ {tag:"Economy",s:"The state should go big on the economy: a much higher minimum wage, universal child care, public options.",
+  a:{d:2,p:{hong:2,roys:1}}, n:{d:1,p:{crowley:2,brennan:2}}, dis:{r:2,p:{tiffany:2,martin:2,baum:1}}},
+ {tag:"Immigration",s:"Local police should be limited from cooperating with ICE, and immigrant communities protected.",
+  a:{d:2,p:{hong:2,roys:1,brennan:1}}, n:{p:{clark:1,murray:1}}, dis:{r:2,p:{ebben:2,alfonso:1,tiffany:1}}},
+ {tag:"Endorsements",s:"A Donald Trump endorsement makes me MORE likely to support a candidate.",
+  a:{r:2,p:{alfonso:2,tiffany:1,ebben:1}}, n:{p:{hermening:1,baum:1,raihala:1}}, dis:{d:2,p:{armstrong:1}}},
+ {tag:"Elections",s:"Wisconsin's election system needs a major overhaul — hand counts, abolishing the elections commission, limits on mail voting.",
+  a:{r:2,p:{myer:2,schroeder:2}}, n:{r:.5,p:{pollnow:1}}, dis:{d:2}},
+ {tag:"Marijuana",s:"Marijuana should be legal for adults in Wisconsin.",
+  a:{d:1.5,p:{hong:1}}, dis:{r:1.5}},
+ {tag:"Energy",s:"Wisconsin should accelerate clean energy — even if that means big new wind and solar projects.",
+  a:{d:2,p:{clark:1,murray:1}}, n:{p:{martin:1}}, dis:{r:2,p:{ebben:2}}},
+ {tag:"Data centers",s:"Big AI data centers should be paused or blocked until Wisconsin has strong rules for them.",
+  a:{d:.5,p:{hong:2,raihala:2}}, n:{p:{crowley:1,brennan:1,clark:1,baum:2}}, dis:{r:1,p:{tiffany:1,martin:1,alfonso:1}}},
+ {tag:"Healthcare",s:"Wisconsin should create a state public option or universal healthcare coverage.",
+  a:{d:2,p:{roys:2,clark:2,hong:1}}, n:{d:.5,p:{crowley:1,brennan:1,murray:1}}, dis:{r:2,p:{tiffany:2,hermening:1}}},
+ {tag:"Education",s:"Public dollars belong in public schools — private-school vouchers should be phased out.",
+  a:{d:2,p:{hong:2,roys:2,murray:1}}, dis:{r:2,p:{varnam:2,tiffany:1,martin:1}}},
+ {tag:"Housing",s:"The best fix for housing costs is cutting zoning rules and red tape so builders can build.",
+  a:{r:1.5,p:{baum:2,raihala:1,martin:1,hermening:1}}, dis:{d:1.5,p:{crowley:2,brennan:2}}},
+ {tag:"Experience",s:"I'd rather elect a proven insider who knows how to govern than an outsider who'll shake things up.",
+  a:{p:{crowley:2,clark:2,roys:1,tiffany:1,hermening:1,martin:1}}, dis:{p:{hong:1,armstrong:2,ebben:1,alfonso:1,baum:1,varnam:1}}},
+ {tag:"Local roots",s:"It matters a lot to me that candidates have deep roots right here in north-central Wisconsin.",
+  a:{p:{murray:1,hermening:2,ebben:1,xiong:2,clark:1}}},
+ {tag:"Rural Wisconsin",s:"Rural Wisconsin's most urgent need is jobs — farms, forestry, manufacturing — more than healthcare or housing.",
+  a:{p:{clark:2,alfonso:2,ebben:1}}, n:{p:{baum:1,crowley:1,brennan:1}}, dis:{p:{hong:1,roys:1,murray:1}}},
+ {tag:"Labor",s:"Wisconsin should restore public-employee collective bargaining and raise the minimum wage.",
+  a:{d:2,p:{roys:2,hong:1,crowley:1}}, dis:{r:2,p:{tiffany:1}}},
+ {tag:"Culture",s:"Legislators should take action on cultural issues like school sports rules and curriculum content.",
+  a:{r:2,p:{varnam:2}}, dis:{d:1,p:{martin:1,baum:1,murray:1,crowley:1}}},
+ {tag:"Treasurer",s:"The State Treasurer should actively grow the school trust fund and expand programs — not just guard the books.",
+  a:{p:{xiong:2}}, dis:{p:{helmenstine:2}}},
+ {tag:"Federal budget",s:"Congress should cut federal spending hard to fight inflation.",
+  a:{r:2,p:{hermening:2,alfonso:1,raihala:1}}, n:{r:.5,p:{alfonso:1,baum:1}}, dis:{d:2,p:{armstrong:1}}},
+ {tag:"Oversight",s:"Congress should aggressively challenge the Trump administration when it oversteps the Constitution.",
+  a:{d:2,p:{armstrong:2,brennan:1,clark:1}}, n:{p:{baum:1,murray:1,hermening:1}}, dis:{r:2,p:{alfonso:1,ebben:1,tiffany:1}}}
 ];
 
-// render questions
+const SCALE = ["Strongly disagree","Disagree","Neutral","Agree","Strongly agree"];
+
+// render statements
 const form = document.getElementById('quiz');
 form.innerHTML = Q.map((qq,i)=>`
-  <fieldset class="q" style="border:1px solid var(--rule);border-top:3px solid var(--rule-heavy);margin:0 0 22px;min-width:0">
-    <legend style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">${qq.q}</legend>
-    <p class="tag">Question ${i+1} of ${Q.length} · ${qq.tag}</p>
-    <h2 aria-hidden="true">${qq.q}</h2>
-    ${qq.o.map((o,j)=>`
-      <label class="opt">
-        <input type="radio" name="q${i}" value="${j}">
-        <span class="oval" aria-hidden="true"></span>
-        <span class="opt-text">${o.t}</span>
-      </label>`).join('')}
+  <fieldset class="q" style="border:1px solid var(--rule);border-top:3px solid var(--rule-heavy);margin:0 0 22px">
+    <legend style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">${qq.s}</legend>
+    <p class="tag">Statement ${i+1} of ${Q.length} · ${qq.tag}</p>
+    <h2 aria-hidden="true">${qq.s}</h2>
+    <div class="likert">
+      ${SCALE.map((lab,v)=>`
+        <label class="lk">
+          <input type="radio" name="q${i}" value="${v}" aria-label="${lab}">
+          <span class="dot d${v}" aria-hidden="true"></span>
+          <span class="lklab" aria-hidden="true">${lab}</span>
+        </label>`).join('')}
+    </div>
   </fieldset>`).join('');
 
 // progress
@@ -405,6 +404,7 @@ form.addEventListener('change',()=>{
 });
 
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function fmt(x){return (Math.round(x*10)/10).toFixed(1).replace(/\.0$/,'')}
 
 document.getElementById('countBtn').addEventListener('click',()=>{
   const answers={};
@@ -415,15 +415,18 @@ document.getElementById('countBtn').addEventListener('click',()=>{
   const answered=Object.keys(answers).length;
   if(answered<12){
     document.getElementById('countNote').textContent=
-      `Only ${answered} of ${Q.length} answered — fill at least 12 ovals for a reliable result.`;
+      `Only ${answered} of ${Q.length} rated — fill at least 12 ovals for a reliable result.`;
     return;
   }
-  // score
+  // score: value 0=SD,1=D,2=N,3=A,4=SA
+  const MULT=[['dis',1],['dis',.5],['n',1],['a',.5],['a',1]];
   let d=0,r=0; const cs={}; Object.keys(C).forEach(k=>cs[k]=0);
-  for(const [i,j] of Object.entries(answers)){
-    const o=Q[i].o[j];
-    d+=o.d||0; r+=o.r||0;
-    if(o.p) for(const [k,v] of Object.entries(o.p)) cs[k]+=v;
+  for(const [i,v] of Object.entries(answers)){
+    const [key,m]=MULT[v];
+    const pay=Q[i][key];
+    if(!pay) continue;
+    d+=(pay.d||0)*m; r+=(pay.r||0)*m;
+    if(pay.p) for(const [k,val] of Object.entries(pay.p)) cs[k]+=val*m;
   }
   const total=d+r;
   const lean = total ? d/total : .5;           // 1 = fully Dem, 0 = fully Rep
@@ -443,7 +446,7 @@ document.getElementById('countBtn').addEventListener('click',()=>{
       <p class="rnote">${race.note}${flat?' Your answers didn’t separate these candidates — read the notes below and go with your gut.':''}${tied?' Your top two are tied — read their notes and pick.':''}</p>
       ${ranked.map((x,idx)=>`
         <div class="cand ${idx===0&&!flat&&!tied?'top':''}">
-          <div class="score">${x.s.toFixed(0)} pts</div>
+          <div class="score">${fmt(x.s)} pts</div>
           <div class="name">${esc(C[x.k].n)}</div>
           <div class="bar"><i style="width:${(x.s/max*100).toFixed(0)}%"></i></div>
           <div class="why">${esc(C[x.k].why)}</div>
@@ -469,11 +472,11 @@ document.getElementById('countBtn').addEventListener('click',()=>{
   res.style.display='block';
   res.innerHTML=`
     <div class="res-head">
-      <p class="eyebrow">Your results · ${answered} of ${Q.length} questions answered</p>
+      <p class="eyebrow">Your results · ${answered} of ${Q.length} statements rated</p>
       <h2>Your ballot recommendation</h2>
-      <div class="lean"><span class="d">Democratic ${d.toFixed(1)}</span>
+      <div class="lean"><span class="d">Democratic ${fmt(d)}</span>
         <div class="leantrack"><div class="leanmark" style="left:calc(${((1-lean)*100).toFixed(1)}% - 2px)"></div></div>
-        <span class="r">${r.toFixed(1)} Republican</span></div>
+        <span class="r">${fmt(r)} Republican</span></div>
       <p class="verdict">${closeCall
         ? `It's genuinely close. Your answers split between the parties — your slightly stronger column is shown first, and the other is under "Curious?" below. Remember you can only vote in <b>one</b>.`
         : `Your answers align most with the ${pill(pick)} — take that column, and here's who matches your priorities in each contested race.`}</p>
