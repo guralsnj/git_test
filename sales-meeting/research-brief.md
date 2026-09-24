@@ -160,7 +160,8 @@ These are the figures used on the slides. Each is current, primary-verified or p
 6. Lead time and availability is the #1 shortlist factor; buyers expect an answer inside 24 hours; "if I have to follow up twice, I eliminate you." Thomasnet 2021.
 7. Distributors win on relationships 81%, availability 76%, technical support 66%, delivery 62%; price fifth at 53%. Industrial Distribution.
 8. Contact within an hour: 7x more likely to qualify than one hour later, 60x more than 24 hours later. Average response 42 hours, 23% never respond. HBR 2011.
-9. 2026 audit of 114 B2B companies: one personalized reply within 5 minutes, none called within 5 minutes, 31% called at all. Workato 2026.
+9. 71% of manufacturers and distributors take a day or more to quote; 88% have lost deals to slow quoting. Aleran 2025 (vendor-sponsored).
+9b. 2026 audit of 114 B2B companies: one personalized reply within 5 minutes, none called within 5 minutes, 31% called at all. Workato 2026.
 10. 77% of leads never get a response; under 1% of first attempts inside 5 minutes. InsideSales 2021.
 11. Reps average 1.3 call attempts. Half of leads called once; 93% of converted leads reached by the 6th call. InsideSales; Velocify 2012 (consumer caveat).
 12. 8 touches to get a meeting for the average rep; 5 for top performers. 55% of buyers accept 2 to 4 contacts, 23% accept 5 to 10. RAIN Group 2018.
@@ -168,9 +169,9 @@ These are the figures used on the slides. Each is current, primary-verified or p
 14. 86% more likely to buy when you understand their goals; 59% say reps don't take time to understand them; 73% say interactions feel transactional. Salesforce 2023.
 15. 95% of warehouse automation buyers rate fast service response very important, up from 83%. MMH/Peerless 2026.
 16. Poor service is the #2 reason business buyers stopped buying (41%), behind price (65%). Salesforce 2024.
-17. 63% will switch after one bad experience. Zendesk 2025.
+17. 50% of U.S. industrial buyers would switch to a supplier with better post-sale support; 87% of millennial buyers. UPS 2017 and 2019.
 18. 80% of frequent B2B buyers switched a supplier in 24 months. Accenture 2019.
-19. Aftermarket margins more than 2x equipment. Deloitte 2026.
+19. Aftermarket margins more than 2x equipment. Deloitte 2026. 97% of manufacturers are changing service and aftermarket operations; only 44% of those tracking satisfaction hit their goals. Salesforce 2024.
 20. 73% of CSOs prioritizing existing-customer growth. Gartner 2025.
 21. 86% of lift truck spend runs through dealers. MMH/Peerless 2025.
 22. Customers expect "contractor-like service" from storage and handling dealers; manufacturer-distributor partnerships "becoming essential." MHEDA 2025 and 2026.
