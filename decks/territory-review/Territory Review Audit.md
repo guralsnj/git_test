@@ -50,30 +50,21 @@ Territories
 
 - No per-territory bookings or hit rate figures. No named Texas RSM. No Mac performance data. No written Excalibur criteria. Nothing that says Walmart consumed capacity in so many words, only that plants weren't full without it.
 
-## Slide structure, 12 minutes plus questions
+## Slide structure, final (revised email, Sept 24)
 
-Nate opens, two slides. Lead time cost us the first half, not the second. Bookings by month against lead time, company-wide. Say it once so it doesn't get relitigated six times.
+Superseded the seven-slide draft. Six slides, ten minutes, pricing left for Day 2. Three decks: RSM, Chad (Walmart, Sam's, Ambient), Mac (national accounts). Excalibur appears only in the RSM deck.
 
-Each presenter, seven slides. Slides 1 and 2 pre-filled by Nate.
+1. In numbers. Bookings and quotes by quarter, top accounts, Excalibur dealers (RSM only). Pre-filled. Two sentences on what the numbers don't show.
+2. Who's winning with what. RSM: top dealers, Excalibur flag, products they perform with, why they pick Steel King. Chad: products performing across Walmart and why Walmart keeps choosing us. Mac: products winning by account, and the biggest new customer opportunities.
+3. What they buy us for, and what's missing. Two or three things they count on us for first, then the one gap that costs the most. Mac's version is why a national account would pick us.
+4. Mindshare. RSM: how you get and keep it, how new dealer reps get up to speed, what's working. Chad: inside Walmart and with their integrators. Mac: how you're getting in the door.
+5. Three wins, one loss. Job, competitor, what won it, repeatable. For the loss: what decided it and what else was true, what we could have done differently. The word price is not on the slide.
+6. Q4. Three projects, one dealer or account to grow, one thing you'd change about how we run sales.
 
-1. Territory in numbers. Bookings by quarter 2025 next to 2026, quote count, company lead time that quarter. Rep adds what the numbers don't show.
-2. Dealer scorecard. Top five dealers with 2025, 2026 YTD, Excalibur flag, GP percent. Rep adds who else they sell and what share we get. Then every Excalibur that is flat, down, or at zero. Rep marks keep, fix, or drop and why.
-3. Dealers to move. Non-Excaliburs that should be in and what it takes. Dealers lost during the 30-week window, where they went, whether they're back.
-4. Three wins. Price, product, speed and support. Why we won, repeatable or not.
-5. Three losses. Same three. Who won, competitor price on the price loss, lead time ours versus theirs on every loss, would we lose it again today.
-6. What we do well and what we don't. Company, marketing, sales direction.
-7. Q4. Three projects, one dealer to grow, one thing done differently, one thing needed from Nate.
-
-Chad: slide 2 is the Walmart decision makers, slide 3 is share of wallet by program against Unarco, Frazier, and Interlake plus the large projects in the pipe, slide 7 is where Walmart grows in 2027.
-
-Mac: slide 2 is the five biggest new customer opportunities, slide 3 is the inherited national accounts and where each stands, slide 7 is where he'd focus us and what he needs.
+Presenter order: Jim or whoever has the cleanest win story goes first. Kurt doesn't go first.
 
 ## Your pull, before the template goes out
 
-- Bookings by quarter by territory, 2025 and 2026, and quote counts. Don's activity report.
-- Company lead time by quarter and by month. Major projects meeting notes or the plants.
-- Top five dealers per territory with 2025, 2026 YTD, and GP percent. Brian's ranked workbook.
-- Every Excalibur per territory with 2025 and 2026 YTD. Don's Access report.
-- Mac's inherited accounts with 2025 and 2026 YTD.
-
-Rough time: a few hours if the workbook and the Access report are current. If not, cut slide 3 and keep the scorecard.
+- Bookings by quarter and quote counts by territory and by national account, 2025 and 2026. Don's activity report.
+- Top accounts YTD per territory, top programs and sites for Walmart, top accounts for Mac.
+- Excalibur dealers YTD per RSM territory. Don's Access report.
