@@ -25,7 +25,7 @@ def fill(slide, idx, text):
     if p.runs: p.runs[0].text = text
     else: p.add_run().text = text
 
-def fill_lines(slide, idx, lines):
+def fill_lines(slide, idx, lines, size=None):
     tf = ph(slide, idx).text_frame
     for extra in tf.paragraphs[1:]:
         extra._p.getparent().remove(extra._p)
@@ -35,6 +35,9 @@ def fill_lines(slide, idx, lines):
     for r in p0.runs[1:]: r._r.getparent().remove(r._r)
     for line in lines[1:]:
         p = tf.add_paragraph(); p.add_run().text = line
+    if size:
+        for p in tf.paragraphs:
+            for r in p.runs: r.font.size = Pt(size)
 
 def drop(slide, idx):
     sh = ph(slide, idx); sh._element.getparent().remove(sh._element)
@@ -117,8 +120,22 @@ def chart(slide, x, y, w, h):
     dl = ch.plots[0].data_labels; dl.font.size = Pt(9); dl.font.name = "Arial"; dl.number_format = '$#,##0"K"'; dl.number_format_is_linked = False
     return ch
 
+def strip_watermark(prs):
+    """Light layouts carry the shield watermark as a background picture. Replace with plain white."""
+    for i in (3, 4, 5, 6, 7, 8, 9, 10, 11, 13):
+        layout = prs.slide_layouts[i]
+        cSld = layout._element.find(qn("p:cSld"))
+        bg = cSld.find(qn("p:bg"))
+        if bg is not None:
+            cSld.remove(bg)
+        new_bg = etree.SubElement(cSld, qn("p:bg")); cSld.insert(0, new_bg)
+        bgPr = etree.SubElement(new_bg, qn("p:bgPr"))
+        sf = etree.SubElement(bgPr, qn("a:solidFill")); etree.SubElement(sf, qn("a:srgbClr"), val="FFFFFF")
+        etree.SubElement(bgPr, qn("a:effectLst"))
+
 def new_deck():
     prs = Presentation(SK)
+    strip_watermark(prs)
     while len(prs.slides) > 0:
         rId = prs.slides._sldIdLst[0].rId
         prs.part.drop_rel(rId); del prs.slides._sldIdLst[0]
@@ -142,10 +159,13 @@ def slide_numbers(prs, label):
     std_header(s, 1, "By the numbers", f"{label} in numbers",
                "[One line on what the numbers say. The story starts here.]")
     drop(s, 103)
-    heading(s, 0.80, 2.32, 5.60, "Bookings and quotes by quarter ($K)  ·  pre-filled")
-    chart(s, 0.80, 2.60, 5.60, 2.00)
-    heading(s, 0.80, 4.72, 5.60, "What the numbers don't show  ·  you fill this in")
-    textbox(s, 0.80, 5.00, 5.60, 1.60,
+    heading(s, 0.80, 2.32, 5.60, "By quarter  ·  pre-filled")
+    table(s, 0.80, 2.60, 5.60, [1.10, 1.10, 1.10, 0.95, 1.35],
+          ["Quarter", "Bookings", "Quotes", "Hit rate", "Quoted lead time"],
+          [["Q4 2025", "", "", "", ""], ["Q1 2026", "", "", "", ""], ["Q2 2026", "", "", "", ""], ["Q3 2026", "", "", "", ""]],
+          row_h=0.29, size=10, header_h=0.30)
+    heading(s, 0.80, 4.30, 5.60, "What the numbers don't show  ·  you fill this in")
+    textbox(s, 0.80, 4.58, 5.60, 2.02,
             "[Two or three sentences. What is happening in the territory that bookings and quotes don't capture. "
             "A dealer in transition, a job that slipped a quarter, a competitor that showed up, a plant issue that cost you.]",
             size=12, color=STEEL, fill_tint=True)
@@ -155,7 +175,7 @@ def slide_numbers(prs, label):
     heading(s, 7.13, 4.48, 5.40, "Excalibur dealers, YTD bookings  ·  pre-filled")
     table(s, 7.13, 4.76, 5.40, [3.40, 2.00], ["Dealer", "YTD bookings"],
           [["", ""], ["", ""], ["", ""]], row_h=0.29, size=10)
-    fill(s, 104, "Source: bookings and quotes from [system], pulled [date]. Pre-filled by Nate.")
+    fill(s, 104, "Source: [system], pulled [date]. Hit rate is bookings divided by quotes. Lead time is the average we quoted that quarter.")
     notes(s, "Slide 1. Bookings and quotes by quarter, top accounts, Excalibur dealers. Pre-filled. "
              "Add a couple of sentences on what the numbers don't show.")
     return s
@@ -215,25 +235,28 @@ def slide_losses(prs):
     std_header(s, 4, "Losses", "Three losses",
                "[One line. Which loss hurt most and whether we'd lose it again today.]")
     fill(s, 106, "Price"); fill(s, 111, "Product"); fill(s, 116, "Speed and support")
-    fill_lines(s, 107, ["Job: [dealer, account, job name]",
+    fill_lines(s, 107, ["Job: [dealer, account, job]",
                         "Who won: [competitor]",
-                        "Their number: [$ or unknown]",
-                        "Our number: [$]",
+                        "Their price: [$ or unknown]",
+                        "Lead time: ours / theirs [wks]",
                         "Why: [ ]",
-                        "Lose it again today: [yes or no]"])
-    fill_lines(s, 112, ["Job: [dealer, account, job name]",
+                        "Lose it again today: [yes/no]"], size=14)
+    fill_lines(s, 112, ["Job: [dealer, account, job]",
                         "Who won: [competitor]",
-                        "Why: [what they had that we didn't]",
-                        "Lose it again today: [yes or no]",
-                        "No product loss? Say so here."])
-    fill_lines(s, 117, ["Job: [dealer, account, job name]",
+                        "Why: [what they had, we didn't]",
+                        "Lead time: ours / theirs [wks]",
+                        "Lose it again today: [yes/no]",
+                        "No product loss? Say so here."], size=14)
+    fill_lines(s, 117, ["Job: [dealer, account, job]",
                         "Who won: [competitor]",
-                        "Why: [lead time, quoting, service]",
-                        "Lose it again today: [yes or no]",
-                        "No speed loss? Say so here."])
+                        "Lead time: ours / theirs [wks]",
+                        "Why: [quoting or service]",
+                        "Lose it again today: [yes/no]",
+                        "No speed loss? Say so here."], size=14)
     drop(s, 118)
     notes(s, "Slide 4. Three losses. One on price, one on product, one on speed and support. Who won, why, and whether we'd lose it "
              "again today. On the price loss, include the competitor's number if you have it. If you don't, say unknown. "
+             "On every loss, the lead time we quoted and the lead time the winner delivered. "
              "If you don't have a loss in one of the three buckets, say so on the slide.")
     return s
 
